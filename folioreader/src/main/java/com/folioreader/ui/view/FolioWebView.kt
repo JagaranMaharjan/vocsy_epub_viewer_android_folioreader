@@ -31,12 +31,14 @@ import com.folioreader.model.HighlightImpl.HighlightStyle
 import com.folioreader.model.sqlite.HighLightTable
 import com.folioreader.ui.activity.FolioActivity
 import com.folioreader.ui.activity.FolioActivityCallback
+import com.folioreader.ui.fragment.AddToMyWordsFragment
 import com.folioreader.ui.fragment.DictionaryFragment
 import com.folioreader.ui.fragment.FolioPageFragment
 import com.folioreader.util.AppUtil
 import com.folioreader.util.HighlightUtil
 import com.folioreader.util.UiUtil
 import dalvik.system.PathClassLoader
+import kotlinx.android.synthetic.main.activity_content_highlight.view.*
 import kotlinx.android.synthetic.main.text_selection.view.*
 import org.json.JSONObject
 import org.springframework.util.ReflectionUtils
@@ -107,6 +109,9 @@ class FolioWebView : WebView {
     private var destroyed: Boolean = false
     private var handleHeight: Int = 0
     private var calculatedProgress = 0.0
+
+    private var xPos: Int = 0
+    private var yPos: Int = 0
 
     private var lastScrollType: LastScrollType? = null
 
@@ -340,6 +345,10 @@ class FolioWebView : WebView {
             dismissPopupWindow()
             loadUrl("javascript:onTextSelectionItemClicked(${it.id})")
         }
+        viewTextSelection.addSelection.setOnClickListener {
+            dismissPopupWindow()
+            loadUrl("javascript:onTextSelectionItemClicked(${it.id})")
+        }
     }
 
     @JavascriptInterface
@@ -362,6 +371,10 @@ class FolioWebView : WebView {
                 Log.v(LOG_TAG, "-> onTextSelectionItemClicked -> defineSelection -> $selectedText")
                 uiHandler.post { showDictDialog(selectedText) }
             }
+            R.id.addSelection -> {
+                Log.v(LOG_TAG, "-> onTextSelectionItemClicked -> addSelection -> $selectedText")
+                uiHandler.post { showAddDialog(selectedText) }
+            }
             else -> {
                 Log.w(LOG_TAG, "-> onTextSelectionItemClicked -> unknown id = $id")
             }
@@ -378,6 +391,33 @@ class FolioWebView : WebView {
             DictionaryFragment::class.java.name
         )
     }
+
+    private  fun showAddDialog (selectedText: String?) {
+        val addWordFragment = AddToMyWordsFragment()
+        val bundle = Bundle()
+        bundle.putString(Constants.SELECTED_WORD, selectedText?.trim())
+
+        val location = IntArray(2)
+
+
+        Log.d(LOG_TAG, "-> xPos -> $xPos")
+        Log.d(LOG_TAG, "-> yPos -> $yPos")
+
+        if (xPos == 0) {
+            xPos= 100
+        }
+
+        if (yPos == 0) {
+            yPos = 100
+        }
+
+        bundle.putInt("x_pos", xPos)
+        bundle.putInt("y_pos", yPos)
+
+        addWordFragment.arguments = bundle
+        addWordFragment.show(parentFragment.fragmentManager!!, AddToMyWordsFragment::class.java.name)
+    }
+
 
     private fun onHighlightColorItemsClicked(style: HighlightStyle, isAlreadyCreated: Boolean) {
         parentFragment.highlight(style, isAlreadyCreated)
@@ -760,6 +800,8 @@ class FolioWebView : WebView {
         aboveSelectionRect.bottom = selectionRect.top - (8 * density).toInt()
         val belowSelectionRect = Rect(viewportRect)
         belowSelectionRect.top = selectionRect.bottom + handleHeight
+        Log.i(LOG_TAG, "-> handleHeight ${handleHeight}")
+
 
         //Log.d(LOG_TAG, "-> aboveSelectionRect -> " + aboveSelectionRect);
         //Log.d(LOG_TAG, "-> belowSelectionRect -> " + belowSelectionRect);
@@ -780,6 +822,7 @@ class FolioWebView : WebView {
         if (belowSelectionRect.contains(popupRect)) {
             Log.i(LOG_TAG, "-> show below")
             popupY = belowSelectionRect.top
+            yPos = belowSelectionRect.top
 
         } else {
 
@@ -790,19 +833,24 @@ class FolioWebView : WebView {
             if (aboveSelectionRect.contains(popupRect)) {
                 Log.i(LOG_TAG, "-> show above")
                 popupY = aboveSelectionRect.bottom - popupRect.height()
+                yPos = popupY
 
             } else {
 
                 Log.i(LOG_TAG, "-> show in middle")
                 val popupYDiff = (viewTextSelection.measuredHeight - selectionRect.height()) / 2
                 popupY = selectionRect.top - popupYDiff
+                yPos = popupY
+
             }
         }
 
         val popupXDiff = (viewTextSelection.measuredWidth - selectionRect.width()) / 2
         val popupX = selectionRect.left - popupXDiff
+        Log.i(LOG_TAG, "-> selectionRect.left ${selectionRect.left}")
 
         popupRect.offsetTo(popupX, popupY)
+        xPos = selectionRect.left
         //Log.d(LOG_TAG, "-> Post decision popupRect -> " + popupRect);
 
         // Check if popupRect left side is going outside of the viewportRect
