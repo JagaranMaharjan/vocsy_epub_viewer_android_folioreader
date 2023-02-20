@@ -45,6 +45,7 @@ public class FolioReader {
     public static final String ACTION_SAVE_READ_LOCATOR = "com.folioreader.action.SAVE_READ_LOCATOR";
     public static final String ACTION_CLOSE_FOLIOREADER = "com.folioreader.action.CLOSE_FOLIOREADER";
     public static final String ACTION_FOLIOREADER_CLOSED = "com.folioreader.action.FOLIOREADER_CLOSED";
+    public static final String EXTRA_ADD_WORD = "com.folioreader.extra.ADD_WORD";
     public static final String ACTION_ADD_WORD = "com.folioreader.action.ADD_WORD";
 
     private Context context;
@@ -79,7 +80,7 @@ public class FolioReader {
          * Or you may call {@link FolioReader#stop()} in this method, if you wouldn't require to open
          * an epub again from your application.
          */
-        void onAddWordListener();
+        void onAddWordListener(String word);
     };
 
     private BroadcastReceiver highlightReceiver = new BroadcastReceiver() {
@@ -117,7 +118,8 @@ public class FolioReader {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (onAddWordListener != null) {
-                onAddWordListener.onAddWordListener();
+                String word = intent.getExtras().getString(EXTRA_ADD_WORD);
+                onAddWordListener.onAddWordListener(word);
             }
         }
     };

@@ -198,7 +198,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onAddWordListener() {
-        Log.v(LOG_TAG, "-> onAddWordListener");
+    public void onAddWordListener(String word) {
+        Log.v(LOG_TAG, "-> onAddWordListener ->" + word);
     }
 }

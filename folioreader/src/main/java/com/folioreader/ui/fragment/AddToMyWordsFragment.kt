@@ -56,24 +56,23 @@ class AddToMyWordsFragment : DialogFragment() {
 //        Log.d(TAG, "-> onCreateDialog -> $xPos")
 //        Log.d(TAG, "-> onCreateDialog -> $yPos")
 
-        onClickAddWord()
+        onClickAddWord(word)
 
         wmlp.x = xPos;
         wmlp.y = yPos;
         return myDialog
     }
 
-    private fun onClickAddWord () {
+    private fun onClickAddWord (word: String) {
         addToWordsView.addWordButton.setOnClickListener {
             Log.d(TAG, "-> addWordButton ->")
 
 
             val localBroadcastManager = LocalBroadcastManager.getInstance(it.context);
             val intent = Intent(FolioReader.ACTION_ADD_WORD)
+            intent.putExtra(FolioReader.EXTRA_ADD_WORD, word)
             localBroadcastManager.sendBroadcast(intent)
         }
-
-
     }
 
     private fun bindViews(view: View) {
