@@ -45,6 +45,7 @@ public class FolioReader {
     public static final String ACTION_SAVE_READ_LOCATOR = "com.folioreader.action.SAVE_READ_LOCATOR";
     public static final String ACTION_CLOSE_FOLIOREADER = "com.folioreader.action.CLOSE_FOLIOREADER";
     public static final String ACTION_FOLIOREADER_CLOSED = "com.folioreader.action.FOLIOREADER_CLOSED";
+    public static final String ACTION_ADD_WORD = "com.folioreader.action.ADD_WORD";
 
     private Context context;
     private Config config;
@@ -54,6 +55,7 @@ public class FolioReader {
     private ReadLocatorListener readLocatorListener;
     private OnClosedListener onClosedListener;
     private ReadLocator readLocator;
+    private OnAddWordListener onAddWordListener;
 
     @Nullable
     public Retrofit retrofit;
@@ -68,7 +70,17 @@ public class FolioReader {
          * an epub again from your application.
          */
         void onFolioReaderClosed();
-    }
+    };
+
+    public interface OnAddWordListener {
+        /**
+         * You may call {@link FolioReader#clear()} in this method, if you wouldn't require to open
+         * an epub again from the current activity.
+         * Or you may call {@link FolioReader#stop()} in this method, if you wouldn't require to open
+         * an epub again from your application.
+         */
+        void onAddWordListener();
+    };
 
     private BroadcastReceiver highlightReceiver = new BroadcastReceiver() {
         @Override
@@ -101,6 +113,17 @@ public class FolioReader {
         }
     };
 
+    private BroadcastReceiver addWordReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (onAddWordListener != null) {
+                onAddWordListener.onAddWordListener();
+            }
+        }
+    };
+
+
+
     public static FolioReader get() {
 
         if (singleton == null) {
@@ -130,6 +153,8 @@ public class FolioReader {
                 new IntentFilter(ACTION_SAVE_READ_LOCATOR));
         localBroadcastManager.registerReceiver(closedReceiver,
                 new IntentFilter(ACTION_FOLIOREADER_CLOSED));
+        localBroadcastManager.registerReceiver(addWordReceiver,
+                new IntentFilter(ACTION_ADD_WORD));
     }
 
     public FolioReader openBook(String assetOrSdcardPath) {
@@ -245,6 +270,11 @@ public class FolioReader {
         return singleton;
     }
 
+    public FolioReader setOnAddWordListener(OnAddWordListener onAddWordListener) {
+        this.onAddWordListener = onAddWordListener;
+        return singleton;
+    }
+
     public void saveReceivedHighLights(List<HighLight> highlights,
                                        OnSaveHighlight onSaveHighlight) {
         new SaveReceivedHighlightTask(onSaveHighlight, highlights).execute();
@@ -275,6 +305,7 @@ public class FolioReader {
             singleton.onHighlightListener = null;
             singleton.readLocatorListener = null;
             singleton.onClosedListener = null;
+            singleton.onAddWordListener = null;
         }
     }
 
@@ -297,5 +328,6 @@ public class FolioReader {
         localBroadcastManager.unregisterReceiver(highlightReceiver);
         localBroadcastManager.unregisterReceiver(readLocatorReceiver);
         localBroadcastManager.unregisterReceiver(closedReceiver);
+        localBroadcastManager.unregisterReceiver(addWordReceiver);
     }
 }

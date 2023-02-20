@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity
-        implements OnHighlightListener, ReadLocatorListener, FolioReader.OnClosedListener {
+        implements OnHighlightListener, ReadLocatorListener, FolioReader.OnClosedListener, FolioReader.OnAddWordListener {
 
     private static final String LOG_TAG = HomeActivity.class.getSimpleName();
     private FolioReader folioReader;
@@ -57,7 +57,8 @@ public class HomeActivity extends AppCompatActivity
         folioReader = FolioReader.get()
                 .setOnHighlightListener(this)
                 .setReadLocatorListener(this)
-                .setOnClosedListener(this);
+                .setOnClosedListener(this)
+                .setOnAddWordListener(this);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getHighlightsAndSave();
@@ -194,5 +195,10 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onFolioReaderClosed() {
         Log.v(LOG_TAG, "-> onFolioReaderClosed");
+    }
+
+    @Override
+    public void onAddWordListener() {
+        Log.v(LOG_TAG, "-> onAddWordListener");
     }
 }
