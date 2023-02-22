@@ -888,6 +888,21 @@ class FolioWebView : WebView {
                 if (oldScrollX == currentScrollX && oldScrollY == currentScrollY && !inTouchMode) {
                     Log.i(LOG_TAG, "-> Stopped scrolling, show Popup")
                     popupWindow.dismiss()
+
+                    evaluateJavascript("javascript:getSelectionText()") { selectedText ->
+                        Log.v(LOG_TAG, "-> wordExist -> $selectedText")
+                        val trimedText: String = selectedText.replace("\u00A0", "");
+                        Log.v(LOG_TAG, "-> wordExist -> $trimedText")
+                        val words = trimedText.split("\\s+".toRegex()).map { word ->
+                            word.replace("""^[,\.]|[,\.]$""".toRegex(), "")
+                        }
+                        Log.v(LOG_TAG, "-> wordExist -> $words")
+                        Log.v(LOG_TAG, "-> wordExist -> ${words.size}")
+                        val showAddWord =  words.size == 1
+                        Log.v(LOG_TAG, "-> wordExist -> $showAddWord")
+
+                        viewTextSelection.addSelection.visibility = if (showAddWord) VISIBLE else GONE
+                    }
                     popupWindow = PopupWindow(viewTextSelection, WRAP_CONTENT, WRAP_CONTENT)
                     popupWindow.isClippingEnabled = false
                     popupWindow.showAtLocation(
