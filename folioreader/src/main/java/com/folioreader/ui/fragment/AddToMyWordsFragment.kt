@@ -16,6 +16,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.folioreader.Constants
 import com.folioreader.FolioReader
 import com.folioreader.R
+import kotlinx.android.synthetic.main.folio_page_fragment.view.*
 import kotlinx.android.synthetic.main.layout_add_to_my_words.view.*
 
 
@@ -89,11 +90,14 @@ class AddToMyWordsFragment : DialogFragment() {
             if (extras != null) {
                 translatedWord = extras.getString(EXTRA_TRANSLATE, "")
                 wordExists = extras.getBoolean(EXTRA_CHECK, false)
+                addToWordsView.addWordButton.isEnabled = !wordExists
+
                 Log.d(TAG, "-> translateAndCheckReceiver -> translatedWord -> $translatedWord")
                 Log.d(TAG, "-> translateAndCheckReceiver -> wordExists -> $wordExists")
+                Log.d(TAG, "-> isEnabled -> ${!wordExists}")
 
                 translatedWordTextView.text = translatedWord
-                addWordButtonTextView.text =  if (wordExists) "Add word" else "Word added"
+                addWordButtonTextView.text =  if (wordExists) "Word added" else "Add word"
             }
         }
     }
@@ -114,7 +118,10 @@ class AddToMyWordsFragment : DialogFragment() {
             val localBroadcastManager = LocalBroadcastManager.getInstance(it.context);
             val intent = Intent(FolioReader.ACTION_ADD_WORD)
             intent.putExtra(FolioReader.EXTRA_ADD_WORD, word)
+
+
             localBroadcastManager.sendBroadcast(intent)
+            dismiss()
         }
     }
 
