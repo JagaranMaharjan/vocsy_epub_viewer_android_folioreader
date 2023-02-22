@@ -19,6 +19,7 @@ import com.folioreader.network.R2StreamerApi;
 import com.folioreader.ui.activity.FolioActivity;
 import com.folioreader.ui.base.OnSaveHighlight;
 import com.folioreader.ui.base.SaveReceivedHighlightTask;
+import com.folioreader.ui.fragment.AddToMyWordsFragment;
 import com.folioreader.util.OnHighlightListener;
 import com.folioreader.util.ReadLocatorListener;
 
@@ -47,6 +48,8 @@ public class FolioReader {
     public static final String ACTION_FOLIOREADER_CLOSED = "com.folioreader.action.FOLIOREADER_CLOSED";
     public static final String EXTRA_ADD_WORD = "com.folioreader.extra.ADD_WORD";
     public static final String ACTION_ADD_WORD = "com.folioreader.action.ADD_WORD";
+    public static final String EXTRA_TRANSLATE_AND_CHECK = "com.folioreader.extra.TRANSLATE_AND_CHECK";
+    public static final String ACTION_TRANSLATE_AND_CHECK = "com.folioreader.action.TRANSLATE_AND_CHECK";
 
     private Context context;
     private Config config;
@@ -57,6 +60,7 @@ public class FolioReader {
     private OnClosedListener onClosedListener;
     private ReadLocator readLocator;
     private OnAddWordListener onAddWordListener;
+    private TranslateAndCheckWordListener translateAndCheckWordListener;
 
     @Nullable
     public Retrofit retrofit;
@@ -74,13 +78,11 @@ public class FolioReader {
     };
 
     public interface OnAddWordListener {
-        /**
-         * You may call {@link FolioReader#clear()} in this method, if you wouldn't require to open
-         * an epub again from the current activity.
-         * Or you may call {@link FolioReader#stop()} in this method, if you wouldn't require to open
-         * an epub again from your application.
-         */
         void onAddWordListener(String word);
+    };
+
+    public  interface TranslateAndCheckWordListener {
+        void translateAndCheckWordListener(String word);
     };
 
     private BroadcastReceiver highlightReceiver = new BroadcastReceiver() {
@@ -124,6 +126,16 @@ public class FolioReader {
         }
     };
 
+    private BroadcastReceiver translateAndCheckReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (translateAndCheckWordListener != null) {
+                String word = intent.getExtras().getString(EXTRA_TRANSLATE_AND_CHECK);
+                translateAndCheckWordListener.translateAndCheckWordListener(word);
+            }
+        }
+    };
+
 
 
     public static FolioReader get() {
@@ -157,6 +169,8 @@ public class FolioReader {
                 new IntentFilter(ACTION_FOLIOREADER_CLOSED));
         localBroadcastManager.registerReceiver(addWordReceiver,
                 new IntentFilter(ACTION_ADD_WORD));
+        localBroadcastManager.registerReceiver(translateAndCheckReceiver,
+                new IntentFilter(ACTION_TRANSLATE_AND_CHECK));
     }
 
     public FolioReader openBook(String assetOrSdcardPath) {
@@ -277,9 +291,21 @@ public class FolioReader {
         return singleton;
     }
 
+    public FolioReader setTranslateAndCheckListener(TranslateAndCheckWordListener translateAndCheckWordListener) {
+        this.translateAndCheckWordListener = translateAndCheckWordListener;
+        return  singleton;
+    }
+
     public void saveReceivedHighLights(List<HighLight> highlights,
                                        OnSaveHighlight onSaveHighlight) {
         new SaveReceivedHighlightTask(onSaveHighlight, highlights).execute();
+    }
+
+    public void sendTranslateAndCheckWord (String translatedWord, boolean wordExist) {
+        Intent intent = new Intent(AddToMyWordsFragment.ACTION_TRANSLATE_AND_CHECK);
+        intent.putExtra(AddToMyWordsFragment.EXTRA_TRANSLATE, translatedWord);
+        intent.putExtra(AddToMyWordsFragment.EXTRA_CHECK, wordExist);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     /**
@@ -308,6 +334,7 @@ public class FolioReader {
             singleton.readLocatorListener = null;
             singleton.onClosedListener = null;
             singleton.onAddWordListener = null;
+            singleton.translateAndCheckWordListener = null;
         }
     }
 
@@ -331,5 +358,6 @@ public class FolioReader {
         localBroadcastManager.unregisterReceiver(readLocatorReceiver);
         localBroadcastManager.unregisterReceiver(closedReceiver);
         localBroadcastManager.unregisterReceiver(addWordReceiver);
+        localBroadcastManager.unregisterReceiver(translateAndCheckReceiver);
     }
 }

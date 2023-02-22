@@ -39,7 +39,7 @@
                     android:id="@+id/translatedWord"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="translate"
+                    android:text="Loading..."
                     android:textColor="@color/dark_night" />
 
             </LinearLayout>
@@ -49,7 +49,7 @@
             android:id="@+id/addWordButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Add to words" />
+            android:text="Loading..." />
     </LinearLayout>
 
 </RelativeLayout>
