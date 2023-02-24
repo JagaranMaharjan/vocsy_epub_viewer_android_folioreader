@@ -6,10 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.Window
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -17,10 +19,12 @@ import com.folioreader.Constants
 import com.folioreader.FolioReader
 import com.folioreader.R
 import kotlinx.android.synthetic.main.folio_page_fragment.view.*
+import kotlinx.android.synthetic.main.layout_add_to_my_words.*
 import kotlinx.android.synthetic.main.layout_add_to_my_words.view.*
+import java.util.*
 
 
-class AddToMyWordsFragment : DialogFragment() {
+class AddToMyWordsFragment : DialogFragment(), TextToSpeech.OnInitListener {
     private val TAG = "AddToMyWordsFragment"
 
     private lateinit var myDialog: Dialog
@@ -33,6 +37,10 @@ class AddToMyWordsFragment : DialogFragment() {
     private lateinit var wordTextView: TextView
     private lateinit var translatedWordTextView: TextView
     private lateinit var addWordButtonTextView: TextView
+
+
+    private var tts: TextToSpeech? = null
+    private lateinit var speechButton: ImageButton
 
     companion object {
         const val EXTRA_TRANSLATE = "EXTRA_TRANSLATE"
@@ -47,6 +55,19 @@ class AddToMyWordsFragment : DialogFragment() {
         Log.d(TAG, "-> onCreate -> ")
     }
 
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            val result = tts?.setLanguage(Locale.US)
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS","The Language specified is not supported!")
+            } else {
+                speechButton.isEnabled = true
+            }
+        } else {
+            Log.e("TTS", "Initilization Failed!")
+        }
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         Log.d(TAG, "-> onCreateDialog -> ")
         myDialog = Dialog(context!!)
@@ -56,6 +77,11 @@ class AddToMyWordsFragment : DialogFragment() {
         word = arguments!!.getString(Constants.SELECTED_WORD, "")
 
         myDialog.setContentView(addToWordsView)
+
+        tts = TextToSpeech(addToWordsView.context, this)
+        speechButton.setOnClickListener {
+            tts?.speak(word, TextToSpeech.QUEUE_FLUSH, null,"")
+        }
 
         wordTextView.text = word;
         translatedWordTextView.text = "Translated"
@@ -129,13 +155,17 @@ class AddToMyWordsFragment : DialogFragment() {
         wordTextView = addToWordsView.selectedWord
         translatedWordTextView = addToWordsView.translatedWord
         addWordButtonTextView = addToWordsView.addWordButton
+        speechButton = addToWordsView.speechButton
         Log.d(TAG, "-> bindViews -> ")
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         Log.d(TAG, "-> onDestroy")
         LocalBroadcastManager.getInstance(addToWordsView.context)
             .unregisterReceiver(translateAndCheckReceiver)
+
+        tts?.stop()
+        tts?.shutdown()
+        super.onDestroy()
     }
 }
