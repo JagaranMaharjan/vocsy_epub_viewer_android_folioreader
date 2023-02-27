@@ -39,6 +39,7 @@ import com.folioreader.util.HighlightUtil
 import com.folioreader.util.UiUtil
 import dalvik.system.PathClassLoader
 import kotlinx.android.synthetic.main.activity_content_highlight.view.*
+import kotlinx.android.synthetic.main.layout_add_to_my_words.view.*
 import kotlinx.android.synthetic.main.text_selection.view.*
 import org.json.JSONObject
 import org.springframework.util.ReflectionUtils
@@ -93,6 +94,7 @@ class FolioWebView : WebView {
     private lateinit var uiHandler: Handler
     private lateinit var folioActivityCallback: FolioActivityCallback
     private lateinit var parentFragment: FolioPageFragment
+    private var addToMyWordsFragment: AddToMyWordsFragment? = null
 
     private var actionMode: ActionMode? = null
     private var textSelectionCb: TextSelectionCb? = null
@@ -154,9 +156,9 @@ class FolioWebView : WebView {
 
     @JavascriptInterface
     fun toggleSystemUI() {
-        uiHandler.post {
-            folioActivityCallback.toggleSystemUI()
-        }
+//        uiHandler.post {
+//            folioActivityCallback.toggleSystemUI()
+//        }
     }
 
     @JavascriptInterface
@@ -222,6 +224,7 @@ class FolioWebView : WebView {
             uiHandler.removeCallbacks(isScrollingRunnable!!)
         }
         isScrollingCheckDuration = 0
+        addToMyWordsFragment?.destroy()
         return wasShowing
     }
 
@@ -260,6 +263,22 @@ class FolioWebView : WebView {
             lastScrollType = LastScrollType.USER
             return false
         }
+
+//        override fun onDoubleTap(e: MotionEvent): Boolean {
+//            Log.v(LOG_TAG, "-> onDoubleTap -> event -> ${e.action}")
+//
+//            webViewPager
+//
+//            evaluateJavascript("javascript:getSelectionRect()") { value ->
+//                val rectJson = JSONObject(value)
+//                setSelectionRect(
+//                    rectJson.getInt("left"), rectJson.getInt("top"),
+//                    rectJson.getInt("right"), rectJson.getInt("bottom")
+//                )
+//            }
+//
+//            return  false;
+//        }
     }
 
     constructor(context: Context) : super(context)
@@ -345,10 +364,10 @@ class FolioWebView : WebView {
             dismissPopupWindow()
             loadUrl("javascript:onTextSelectionItemClicked(${it.id})")
         }
-        viewTextSelection.addSelection.setOnClickListener {
-            dismissPopupWindow()
-            loadUrl("javascript:onTextSelectionItemClicked(${it.id})")
-        }
+//        viewTextSelection.addWordButton.setOnClickListener {
+//            dismissPopupWindow()
+//            loadUrl("javascript:onTextSelectionItemClicked(${it.id})")
+//        }
     }
 
     @JavascriptInterface
@@ -371,10 +390,10 @@ class FolioWebView : WebView {
                 Log.v(LOG_TAG, "-> onTextSelectionItemClicked -> defineSelection -> $selectedText")
                 uiHandler.post { showDictDialog(selectedText) }
             }
-            R.id.addSelection -> {
-                Log.v(LOG_TAG, "-> onTextSelectionItemClicked -> addSelection -> $selectedText")
-                uiHandler.post { showAddDialog(selectedText) }
-            }
+//            R.id.addSelection -> {
+//                Log.v(LOG_TAG, "-> onTextSelectionItemClicked -> addSelection -> $selectedText")
+//                uiHandler.post { showAddDialog(selectedText) }
+//            }
             else -> {
                 Log.w(LOG_TAG, "-> onTextSelectionItemClicked -> unknown id = $id")
             }
@@ -392,31 +411,31 @@ class FolioWebView : WebView {
         )
     }
 
-    private  fun showAddDialog (selectedText: String?) {
-        val addWordFragment = AddToMyWordsFragment()
-        val bundle = Bundle()
-        bundle.putString(Constants.SELECTED_WORD, selectedText?.trim())
-
-        val location = IntArray(2)
-
-
-        Log.d(LOG_TAG, "-> xPos -> $xPos")
-        Log.d(LOG_TAG, "-> yPos -> $yPos")
-
-        if (xPos == 0) {
-            xPos= 100
-        }
-
-        if (yPos == 0) {
-            yPos = 100
-        }
-
-        bundle.putInt("x_pos", xPos)
-        bundle.putInt("y_pos", yPos)
-
-        addWordFragment.arguments = bundle
-        addWordFragment.show(parentFragment.fragmentManager!!, AddToMyWordsFragment::class.java.name)
-    }
+//    private  fun showAddDialog (selectedText: String?) {
+//        val addWordFragment = AddToMyWordsFragment()
+//        val bundle = Bundle()
+//        bundle.putString(Constants.SELECTED_WORD, selectedText?.trim())
+//
+//        val location = IntArray(2)
+//
+//
+//        Log.d(LOG_TAG, "-> xPos -> $xPos")
+//        Log.d(LOG_TAG, "-> yPos -> $yPos")
+//
+//        if (xPos == 0) {
+//            xPos= 100
+//        }
+//
+//        if (yPos == 0) {
+//            yPos = 100
+//        }
+//
+//        bundle.putInt("x_pos", xPos)
+//        bundle.putInt("y_pos", yPos)
+//
+//        addWordFragment.arguments = bundle
+//        addWordFragment.show(parentFragment.fragmentManager!!, AddToMyWordsFragment::class.java.name)
+//    }
 
 
     private fun onHighlightColorItemsClicked(style: HighlightStyle, isAlreadyCreated: Boolean) {
@@ -873,6 +892,7 @@ class FolioWebView : WebView {
             Log.v(LOG_TAG, "-> showTextSelectionPopup")
             Log.d(LOG_TAG, "-> showTextSelectionPopup -> To be laid out popupRect -> $popupRect")
             popupWindow.dismiss()
+            addToMyWordsFragment?.destroy()
             oldScrollX = scrollX
             oldScrollY = scrollY
 
@@ -890,18 +910,19 @@ class FolioWebView : WebView {
                     popupWindow.dismiss()
 
                     evaluateJavascript("javascript:getSelectionText()") { selectedText ->
-                        Log.v(LOG_TAG, "-> wordExist -> $selectedText")
-                        val trimedText: String = selectedText.replace("\u00A0", "");
-                        Log.v(LOG_TAG, "-> wordExist -> $trimedText")
-                        val words = trimedText.split("\\s+".toRegex()).map { word ->
-                            word.replace("""^[,\.]|[,\.]$""".toRegex(), "")
-                        }
-                        Log.v(LOG_TAG, "-> wordExist -> $words")
-                        Log.v(LOG_TAG, "-> wordExist -> ${words.size}")
-                        val showAddWord =  words.size == 1
-                        Log.v(LOG_TAG, "-> wordExist -> $showAddWord")
+//                        Log.v(LOG_TAG, "-> wordExist -> $selectedText")
+//                        val trimedText: String = selectedText.replace("\u00A0", "");
+//                        Log.v(LOG_TAG, "-> wordExist -> $trimedText")
+//                        val words = trimedText.split("\\s+".toRegex()).map { word ->
+//                            word.replace("""^[,\.]|[,\.]$""".toRegex(), "")
+//                        }
+//                        Log.v(LOG_TAG, "-> wordExist -> $words")
+//                        Log.v(LOG_TAG, "-> wordExist -> ${words.size}")
+//                        val showAddWord =  words.size == 1
+//                        Log.v(LOG_TAG, "-> wordExist -> $showAddWord")
 
-                        viewTextSelection.addSelection.visibility = if (showAddWord) VISIBLE else GONE
+//                        viewTextSelection.addSelection.visibility = if (showAddWord) VISIBLE else GONE
+                        addToMyWordsFragment = AddToMyWordsFragment(selectedText, viewTextSelection.addToMyWordsInclude)
                     }
                     popupWindow = PopupWindow(viewTextSelection, WRAP_CONTENT, WRAP_CONTENT)
                     popupWindow.isClippingEnabled = false

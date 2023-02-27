@@ -7,7 +7,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="2dp"
+        app:cardCornerRadius="8dp"
         app:cardElevation="5dp"
         app:cardUseCompatPadding="true">
 
@@ -49,15 +49,24 @@
                     android:layout_height="wrap_content"
                     android:text="@string/define" />
 
-                <TextView
-                    android:id="@+id/addSelection"
-                    style="@style/TextViewTextSelector"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="@string/addWord" />
+<!--                <TextView-->
+<!--                    android:id="@+id/addSelection"-->
+<!--                    style="@style/TextViewTextSelector"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="@string/addWord" />-->
 
             </LinearLayout>
+
+            <include
+                android:id="@+id/addToMyWordsInclude"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                layout="@layout/layout_add_to_my_words"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/firstSectionLayout"/>
 
             <View
                 android:id="@+id/firstHorizontalDivider"
@@ -66,7 +75,7 @@
                 android:background="#BBB"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/firstSectionLayout" />
+                app:layout_constraintTop_toBottomOf="@id/addToMyWordsInclude" />
 
             <HorizontalScrollView
                 android:id="@+id/highlightScrollView"

@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.Window
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
@@ -24,7 +25,7 @@ import kotlinx.android.synthetic.main.layout_add_to_my_words.view.*
 import java.util.*
 
 
-class AddToMyWordsFragment : DialogFragment(), TextToSpeech.OnInitListener {
+class AddToMyWordsFragment(word: String, addToWardView: View) : TextToSpeech.OnInitListener {
     private val TAG = "AddToMyWordsFragment"
 
     private lateinit var myDialog: Dialog
@@ -36,7 +37,7 @@ class AddToMyWordsFragment : DialogFragment(), TextToSpeech.OnInitListener {
     private lateinit var addToWordsView: View
     private lateinit var wordTextView: TextView
     private lateinit var translatedWordTextView: TextView
-    private lateinit var addWordButtonTextView: TextView
+    private lateinit var addWordButton: Button
 
 
     private var tts: TextToSpeech? = null
@@ -46,66 +47,6 @@ class AddToMyWordsFragment : DialogFragment(), TextToSpeech.OnInitListener {
         const val EXTRA_TRANSLATE = "EXTRA_TRANSLATE"
         const val EXTRA_CHECK = "EXTRA_CHECK"
         const val ACTION_TRANSLATE_AND_CHECK = "ACTION_TRANSLATE_AND_CHECK"
-    }
-
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d(TAG, "-> onCreate -> ")
-    }
-
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            val result = tts?.setLanguage(Locale.US)
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e("TTS","The Language specified is not supported!")
-            } else {
-                speechButton.isEnabled = true
-            }
-        } else {
-            Log.e("TTS", "Initilization Failed!")
-        }
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        Log.d(TAG, "-> onCreateDialog -> ")
-        myDialog = Dialog(context!!)
-        addToWordsView = View.inflate(context, R.layout.layout_add_to_my_words, null)
-        myDialog.window!!.requestFeature(Window.FEATURE_NO_TITLE)
-        bindViews(addToWordsView)
-        word = arguments!!.getString(Constants.SELECTED_WORD, "")
-
-        myDialog.setContentView(addToWordsView)
-
-        tts = TextToSpeech(addToWordsView.context, this)
-        speechButton.setOnClickListener {
-            tts?.speak(word, TextToSpeech.QUEUE_FLUSH, null,"")
-        }
-
-        wordTextView.text = word;
-        translatedWordTextView.text = "Translated"
-
-        val wmlp = myDialog!!.window!!.attributes;
-        wmlp.gravity = Gravity.TOP or Gravity.LEFT
-
-
-        val xPos = arguments!!.getInt("x_pos")
-        val yPos = arguments!!.getInt("y_pos")
-//        Log.d(TAG, "-> onCreateDialog -> $xPos")
-//        Log.d(TAG, "-> onCreateDialog -> $yPos")
-
-        Log.d(TAG, "-> registerReceiver")
-        LocalBroadcastManager.getInstance(addToWordsView.context).registerReceiver(
-            translateAndCheckReceiver, IntentFilter(AddToMyWordsFragment.ACTION_TRANSLATE_AND_CHECK)
-        )
-
-        translateAndCheckWord(word);
-        onClickAddWord(word)
-
-        wmlp.x = xPos;
-        wmlp.y = yPos;
-        return myDialog
     }
 
     private val translateAndCheckReceiver = object : BroadcastReceiver () {
@@ -123,10 +64,120 @@ class AddToMyWordsFragment : DialogFragment(), TextToSpeech.OnInitListener {
                 Log.d(TAG, "-> isEnabled -> ${!wordExists}")
 
                 translatedWordTextView.text = translatedWord
-                addWordButtonTextView.text =  if (wordExists) "Word added" else "Add word"
+                addWordButton.text =  if (wordExists) "Word added" else "Add word"
             }
         }
     }
+
+    init {
+        Log.d(TAG, "-> init -> ")
+
+        addToWordsView = addToWardView
+        bindViews(addToWordsView)
+
+        this.word = word;
+
+        tts = TextToSpeech(addToWordsView.context, this)
+        speechButton.setOnClickListener {
+            tts?.speak(word, TextToSpeech.QUEUE_FLUSH, null,"")
+        }
+
+        wordTextView.text = word;
+        translatedWordTextView.text = "Translated"
+
+        Log.d(TAG, "-> registerReceiver")
+        LocalBroadcastManager.getInstance(addToWordsView.context).registerReceiver(
+            translateAndCheckReceiver, IntentFilter(AddToMyWordsFragment.ACTION_TRANSLATE_AND_CHECK)
+        )
+
+        addWordButton.visibility = if(showAddButton(word)) View.VISIBLE else View.GONE
+
+        translateAndCheckWord(word);
+        onClickAddWord(word)
+    }
+
+    private fun showAddButton (selectedText: String): Boolean {
+        Log.v(TAG, "-> wordExist -> $selectedText")
+        val trimedText: String = selectedText.replace("\u00A0", "");
+        Log.v(TAG, "-> wordExist -> $trimedText")
+        val words = trimedText.split("\\s+".toRegex()).map { word ->
+            word.replace("""^[,\.]|[,\.]$""".toRegex(), "")
+        }
+        Log.v(TAG, "-> wordExist -> $words")
+        Log.v(TAG, "-> wordExist -> ${words.size}")
+        val showAddWord =  words.size <= 3
+        Log.v(TAG, "-> wordExist -> $showAddWord")
+
+        return showAddWord
+    }
+
+    override fun onInit(status: Int) {
+        if (status == TextToSpeech.SUCCESS) {
+            val result = tts?.setLanguage(Locale.US)
+            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e("TTS","The Language specified is not supported!")
+            } else {
+                speechButton.isEnabled = true
+            }
+        } else {
+            Log.e("TTS", "Initilization Failed!")
+        }
+    }
+
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        Log.d(TAG, "-> onCreate -> ")
+//    }
+
+//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+//        Log.d(TAG, "-> onCreateDialog -> ")
+//        myDialog = Dialog(context!!)
+//        addToWordsView = View.inflate(context, R.layout.layout_add_to_my_words, null)
+//        myDialog.window!!.requestFeature(Window.FEATURE_NO_TITLE)
+//        bindViews(addToWordsView)
+//        word = arguments!!.getString(Constants.SELECTED_WORD, "")
+//
+//        myDialog.setContentView(addToWordsView)
+//
+//        tts = TextToSpeech(addToWordsView.context, this)
+//        speechButton.setOnClickListener {
+//            tts?.speak(word, TextToSpeech.QUEUE_FLUSH, null,"")
+//        }
+//
+//        wordTextView.text = word;
+//        translatedWordTextView.text = "Translated"
+//
+//        val wmlp = myDialog!!.window!!.attributes;
+//        wmlp.gravity = Gravity.TOP or Gravity.LEFT
+//
+//
+//        val xPos = arguments!!.getInt("x_pos")
+//        val yPos = arguments!!.getInt("y_pos")
+////        Log.d(TAG, "-> onCreateDialog -> $xPos")
+////        Log.d(TAG, "-> onCreateDialog -> $yPos")
+//
+//        Log.d(TAG, "-> registerReceiver")
+//        LocalBroadcastManager.getInstance(addToWordsView.context).registerReceiver(
+//            translateAndCheckReceiver, IntentFilter(AddToMyWordsFragment.ACTION_TRANSLATE_AND_CHECK)
+//        )
+//
+//        translateAndCheckWord(word);
+//        onClickAddWord(word)
+//
+//        wmlp.x = xPos;
+//        wmlp.y = yPos;
+//        return myDialog
+//    }
+
+     fun destroy () {
+        Log.d(TAG, "-> onDestroy")
+        LocalBroadcastManager.getInstance(addToWordsView.context)
+            .unregisterReceiver(translateAndCheckReceiver)
+
+        tts?.stop()
+        tts?.shutdown()
+    }
+
 
     private fun translateAndCheckWord (word: String) {
         Log.d(TAG, "-> translateAndCheckWord")
@@ -137,7 +188,7 @@ class AddToMyWordsFragment : DialogFragment(), TextToSpeech.OnInitListener {
     }
 
     private fun onClickAddWord (word: String) {
-        addToWordsView.addWordButton.setOnClickListener {
+        addWordButton.setOnClickListener {
             Log.d(TAG, "-> addWordButton ->")
 
 
@@ -147,25 +198,25 @@ class AddToMyWordsFragment : DialogFragment(), TextToSpeech.OnInitListener {
 
 
             localBroadcastManager.sendBroadcast(intent)
-            dismiss()
+//            dismiss()
         }
     }
 
     private fun bindViews(view: View) {
+        Log.d(TAG, "-> bindViews -> ")
         wordTextView = addToWordsView.selectedWord
         translatedWordTextView = addToWordsView.translatedWord
-        addWordButtonTextView = addToWordsView.addWordButton
+        addWordButton = addToWordsView.addWordButton
         speechButton = addToWordsView.speechButton
-        Log.d(TAG, "-> bindViews -> ")
     }
 
-    override fun onDestroy() {
-        Log.d(TAG, "-> onDestroy")
-        LocalBroadcastManager.getInstance(addToWordsView.context)
-            .unregisterReceiver(translateAndCheckReceiver)
-
-        tts?.stop()
-        tts?.shutdown()
-        super.onDestroy()
-    }
+//    override fun onDestroy() {
+//        Log.d(TAG, "-> onDestroy")
+//        LocalBroadcastManager.getInstance(addToWordsView.context)
+//            .unregisterReceiver(translateAndCheckReceiver)
+//
+//        tts?.stop()
+//        tts?.shutdown()
+//        super.onDestroy()
+//    }
 }
