@@ -30,7 +30,7 @@ class AddToMyWordsFragment(word: String, addToWardView: View) : TextToSpeech.OnI
 
     private lateinit var myDialog: Dialog
 
-    private var word: String = ""
+    private var selectedWord: String = ""
     private var translatedWord: String = ""
     private var wordExists: Boolean = false
 
@@ -64,7 +64,7 @@ class AddToMyWordsFragment(word: String, addToWardView: View) : TextToSpeech.OnI
                 Log.d(TAG, "-> isEnabled -> ${!wordExists}")
 
                 translatedWordTextView.text = translatedWord
-                addWordButton.text =  if (wordExists) "Word added" else "Add word"
+                addWordButton.text =  if (wordExists) "Word added" else "Add to Pocket"
             }
         }
     }
@@ -75,14 +75,14 @@ class AddToMyWordsFragment(word: String, addToWardView: View) : TextToSpeech.OnI
         addToWordsView = addToWardView
         bindViews(addToWordsView)
 
-        this.word = word;
+        selectedWord = word.substring(1, word.length-1)
 
         tts = TextToSpeech(addToWordsView.context, this)
         speechButton.setOnClickListener {
-            tts?.speak(word, TextToSpeech.QUEUE_FLUSH, null,"")
+            tts?.speak(selectedWord, TextToSpeech.QUEUE_FLUSH, null,"")
         }
 
-        wordTextView.text = word;
+        wordTextView.text = selectedWord;
         translatedWordTextView.text = "Translated"
 
         Log.d(TAG, "-> registerReceiver")
@@ -90,10 +90,10 @@ class AddToMyWordsFragment(word: String, addToWardView: View) : TextToSpeech.OnI
             translateAndCheckReceiver, IntentFilter(AddToMyWordsFragment.ACTION_TRANSLATE_AND_CHECK)
         )
 
-        addWordButton.visibility = if(showAddButton(word)) View.VISIBLE else View.GONE
+        addWordButton.visibility = if(showAddButton(selectedWord)) View.VISIBLE else View.GONE
 
-        translateAndCheckWord(word);
-        onClickAddWord(word)
+        translateAndCheckWord(selectedWord);
+        onClickAddWord(selectedWord)
     }
 
     private fun showAddButton (selectedText: String): Boolean {

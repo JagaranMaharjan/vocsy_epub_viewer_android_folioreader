@@ -4,6 +4,14 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
+<!--    <com.folioreader.ui.view.InterPopupShape-->
+<!--        android:id="@+id/interPopup"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        app:backgroundSplit="@color/colorPrimary">-->
+<!--        -->
+<!--    </com.folioreader.ui.view.InterPopupShape>-->
+
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,66 +24,66 @@
             android:layout_height="wrap_content"
             android:background="?popUpWindowBackground">
 
-            <LinearLayout
-                android:id="@+id/firstSectionLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <TextView
-                    android:id="@+id/copySelection"
-                    style="@style/TextViewTextSelector"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="@string/copy" />
-
-                <TextView
-                    android:id="@+id/shareSelection"
-                    style="@style/TextViewTextSelector"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="@string/share" />
-
-                <TextView
-                    android:id="@+id/defineSelection"
-                    style="@style/TextViewTextSelector"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="@string/define" />
-
-<!--                <TextView-->
-<!--                    android:id="@+id/addSelection"-->
-<!--                    style="@style/TextViewTextSelector"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:text="@string/addWord" />-->
-
-            </LinearLayout>
-
             <include
                 android:id="@+id/addToMyWordsInclude"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 layout="@layout/layout_add_to_my_words"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/firstSectionLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_margin="12dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/firstSectionLayout"/>
+                app:layout_constraintTop_toBottomOf="@+id/addToMyWordsInclude">
+
+                <ImageButton
+                    android:id="@+id/copySelection"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/inter_grey_button"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_copy" />
+
+                <ImageButton
+                    android:id="@+id/shareSelection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:background="@drawable/inter_grey_button"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_share" />
+
+                <ImageButton
+                    android:id="@+id/defineSelection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/inter_grey_button"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_define" />
+
+            </LinearLayout>
 
             <View
                 android:id="@+id/firstHorizontalDivider"
                 android:layout_width="0dp"
                 android:layout_height="1dp"
-                android:background="#BBB"
+                android:background="@color/sky_Lighter"
+                android:layout_marginTop="12dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/addToMyWordsInclude" />
+                app:layout_constraintTop_toBottomOf="@id/firstSectionLayout" />
 
             <HorizontalScrollView
                 android:id="@+id/highlightScrollView"
@@ -89,35 +97,43 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
-                    <ImageView
-                        android:id="@+id/deleteHighlight"
-                        style="@style/ImageViewTextSelectorMarker"
-                        app:srcCompat="@drawable/ic_highlight_delete" />
 
                     <ImageView
-                        android:id="@+id/yellowHighlight"
+                        android:id="@+id/underlineHighlight"
                         style="@style/ImageViewTextSelectorMarker"
-                        android:src="@drawable/shape_highlight_yellow" />
+                        android:contentDescription="underline"
+                        android:src="@drawable/ic_underline"/>
 
                     <ImageView
                         android:id="@+id/greenHighlight"
                         style="@style/ImageViewTextSelectorMarker"
+                        android:contentDescription="green"
                         android:src="@drawable/shape_highlight_green" />
+
+                    <ImageView
+                        android:id="@+id/yellowHighlight"
+                        style="@style/ImageViewTextSelectorMarker"
+                        android:contentDescription="yellow"
+                        android:src="@drawable/shape_highlight_yellow" />
 
                     <ImageView
                         android:id="@+id/blueHighlight"
                         style="@style/ImageViewTextSelectorMarker"
+                        android:contentDescription="blue"
                         android:src="@drawable/shape_highlight_blue" />
 
                     <ImageView
                         android:id="@+id/pinkHighlight"
                         style="@style/ImageViewTextSelectorMarker"
+                        android:contentDescription="pink"
                         android:src="@drawable/shape_highlight_pink" />
 
                     <ImageView
-                        android:id="@+id/underlineHighlight"
+                        android:id="@+id/deleteHighlight"
                         style="@style/ImageViewTextSelectorMarker"
-                        app:srcCompat="@drawable/ic_format_underlined" />
+                        android:contentDescription="delete"
+                        android:src="@drawable/ic_delete" />
+
 
                 </LinearLayout>
 
