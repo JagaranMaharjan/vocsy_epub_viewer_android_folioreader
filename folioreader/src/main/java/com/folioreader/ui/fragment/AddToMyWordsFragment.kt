@@ -25,7 +25,7 @@ import kotlinx.android.synthetic.main.layout_add_to_my_words.view.*
 import java.util.*
 
 
-class AddToMyWordsFragment(word: String, addToWardView: View) : TextToSpeech.OnInitListener {
+class AddToMyWordsFragment(word: String, addToWardView: View) {
     private val TAG = "AddToMyWordsFragment"
 
     private lateinit var myDialog: Dialog
@@ -40,7 +40,7 @@ class AddToMyWordsFragment(word: String, addToWardView: View) : TextToSpeech.OnI
     private lateinit var addWordButton: Button
 
 
-    private var tts: TextToSpeech? = null
+//    private var tts: TextToSpeech? = null
     private lateinit var speechButton: ImageButton
 
     companion object {
@@ -77,10 +77,10 @@ class AddToMyWordsFragment(word: String, addToWardView: View) : TextToSpeech.OnI
 
         selectedWord = word.substring(1, word.length-1)
 
-        tts = TextToSpeech(addToWordsView.context, this)
-        speechButton.setOnClickListener {
-            tts?.speak(selectedWord, TextToSpeech.QUEUE_FLUSH, null,"")
-        }
+//        tts = TextToSpeech(addToWordsView.context, this)
+//        speechButton.setOnClickListener {
+//            tts?.speak(selectedWord, TextToSpeech.QUEUE_FLUSH, null,"")
+//        }
 
         wordTextView.text = selectedWord;
         translatedWordTextView.text = "Translated"
@@ -94,6 +94,7 @@ class AddToMyWordsFragment(word: String, addToWardView: View) : TextToSpeech.OnI
 
         translateAndCheckWord(selectedWord);
         onClickAddWord(selectedWord)
+        onClickSpeechButton(selectedWord)
     }
 
     private fun showAddButton (selectedText: String): Boolean {
@@ -111,18 +112,18 @@ class AddToMyWordsFragment(word: String, addToWardView: View) : TextToSpeech.OnI
         return showAddWord
     }
 
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            val result = tts?.setLanguage(Locale.US)
-            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.e("TTS","The Language specified is not supported!")
-            } else {
-                speechButton.isEnabled = true
-            }
-        } else {
-            Log.e("TTS", "Initilization Failed!")
-        }
-    }
+//    override fun onInit(status: Int) {
+//        if (status == TextToSpeech.SUCCESS) {
+//            val result = tts?.setLanguage(Locale.US)
+//            if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+//                Log.e("TTS","The Language specified is not supported!")
+//            } else {
+//                speechButton.isEnabled = true
+//            }
+//        } else {
+//            Log.e("TTS", "Initilization Failed!")
+//        }
+//    }
 
 //    override fun onCreate(savedInstanceState: Bundle?) {
 //        super.onCreate(savedInstanceState)
@@ -169,13 +170,17 @@ class AddToMyWordsFragment(word: String, addToWardView: View) : TextToSpeech.OnI
 //        return myDialog
 //    }
 
-     fun destroy () {
+    fun destroy () {
         Log.d(TAG, "-> onDestroy")
-        LocalBroadcastManager.getInstance(addToWordsView.context)
-            .unregisterReceiver(translateAndCheckReceiver)
 
-        tts?.stop()
-        tts?.shutdown()
+        val intent = Intent(FolioReader.ACTION_DISMISS_POPUP)
+        LocalBroadcastManager.getInstance(addToWordsView.context).sendBroadcast(intent)
+
+        LocalBroadcastManager.getInstance(addToWordsView.context)
+        .unregisterReceiver(translateAndCheckReceiver)
+
+        //        tts?.stop()
+        //        tts?.shutdown()
     }
 
 
@@ -192,13 +197,23 @@ class AddToMyWordsFragment(word: String, addToWardView: View) : TextToSpeech.OnI
             Log.d(TAG, "-> addWordButton ->")
 
 
-            val localBroadcastManager = LocalBroadcastManager.getInstance(it.context);
+            val localBroadcastManager = LocalBroadcastManager.getInstance(it.context)
             val intent = Intent(FolioReader.ACTION_ADD_WORD)
             intent.putExtra(FolioReader.EXTRA_ADD_WORD, word)
 
+            localBroadcastManager.sendBroadcast(intent)
+        }
+    }
+
+    private fun onClickSpeechButton (textToSpeech: String) {
+        speechButton.setOnClickListener {
+            Log.d(TAG, "-> speechButton -> $textToSpeech")
+
+            val localBroadcastManager = LocalBroadcastManager.getInstance(it.context)
+            val  intent = Intent(FolioReader.ACTION_TEXT_TO_SPEECH)
+            intent.putExtra(FolioReader.EXTRA_TEXT_TO_SPEECH, textToSpeech)
 
             localBroadcastManager.sendBroadcast(intent)
-//            dismiss()
         }
     }
 

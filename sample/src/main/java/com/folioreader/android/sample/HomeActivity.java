@@ -46,7 +46,8 @@ import java.util.Map;
 
 public class HomeActivity extends AppCompatActivity
         implements OnHighlightListener, ReadLocatorListener,FolioReader.OnClosedListener,
-        FolioReader.OnAddWordListener, FolioReader.TranslateAndCheckWordListener {
+        FolioReader.OnAddWordListener, FolioReader.TranslateAndCheckWordListener, FolioReader.TextToSpeechListener,
+        FolioReader.OnDismissPopupListener {
 
     private static final String LOG_TAG = HomeActivity.class.getSimpleName();
     private FolioReader folioReader;
@@ -61,7 +62,9 @@ public class HomeActivity extends AppCompatActivity
                 .setReadLocatorListener(this)
                 .setOnClosedListener(this)
                 .setOnAddWordListener(this)
-                .setTranslateAndCheckListener(this);
+                .setTranslateAndCheckListener(this)
+                .setTextToSpeechListener(this)
+                .setOnDismissPopupListener(this);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getHighlightsAndSave();
@@ -208,6 +211,16 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void translateAndCheckWordListener(String word) {
         Log.v(LOG_TAG, "-> translateAndCheckWordListener ->" + word);
+    }
+
+    @Override
+    public void textToSpeechListener(String word) {
+        Log.v(LOG_TAG, "-> textToSpeechListener ->" + word);
+    }
+
+    @Override
+    public void onDismissPopupListener() {
+        Log.v(LOG_TAG, "-> onDismissPopupListener ->");
     }
 
     public void sendTranslateAndCheck(String translate, boolean wordExist) {

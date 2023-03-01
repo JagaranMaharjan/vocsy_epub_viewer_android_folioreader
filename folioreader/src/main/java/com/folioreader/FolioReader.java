@@ -50,6 +50,9 @@ public class FolioReader {
     public static final String ACTION_ADD_WORD = "com.folioreader.action.ADD_WORD";
     public static final String EXTRA_TRANSLATE_AND_CHECK = "com.folioreader.extra.TRANSLATE_AND_CHECK";
     public static final String ACTION_TRANSLATE_AND_CHECK = "com.folioreader.action.TRANSLATE_AND_CHECK";
+    public static final String ACTION_TEXT_TO_SPEECH = "com.folioreader.action.TEXT_TO_SPEECH";
+    public static final String EXTRA_TEXT_TO_SPEECH = "com.folioreader.extra.TEXT_TO_SPEECH";
+    public static final String ACTION_DISMISS_POPUP = "com.folioreader.action.DISMISS_POPUP";
 
     private Context context;
     private Config config;
@@ -61,6 +64,8 @@ public class FolioReader {
     private ReadLocator readLocator;
     private OnAddWordListener onAddWordListener;
     private TranslateAndCheckWordListener translateAndCheckWordListener;
+    private TextToSpeechListener textToSpeechListener;
+    private OnDismissPopupListener onDismissPopupListener;
 
     @Nullable
     public Retrofit retrofit;
@@ -84,6 +89,14 @@ public class FolioReader {
     public  interface TranslateAndCheckWordListener {
         void translateAndCheckWordListener(String word);
     };
+
+    public interface TextToSpeechListener {
+        void textToSpeechListener(String word);
+    }
+
+    public interface OnDismissPopupListener {
+        void onDismissPopupListener();
+    }
 
     private BroadcastReceiver highlightReceiver = new BroadcastReceiver() {
         @Override
@@ -136,6 +149,25 @@ public class FolioReader {
         }
     };
 
+    private BroadcastReceiver textToSpeechReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (textToSpeechListener != null) {
+                String word = intent.getExtras().getString(EXTRA_TEXT_TO_SPEECH);
+                textToSpeechListener.textToSpeechListener(word);
+            }
+        }
+    };
+
+    private BroadcastReceiver onDismissPopupReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (onDismissPopupListener != null) {
+                onDismissPopupListener.onDismissPopupListener();
+            }
+        }
+    };
+
 
 
     public static FolioReader get() {
@@ -171,6 +203,10 @@ public class FolioReader {
                 new IntentFilter(ACTION_ADD_WORD));
         localBroadcastManager.registerReceiver(translateAndCheckReceiver,
                 new IntentFilter(ACTION_TRANSLATE_AND_CHECK));
+        localBroadcastManager.registerReceiver(textToSpeechReceiver,
+                new IntentFilter(ACTION_TEXT_TO_SPEECH));
+        localBroadcastManager.registerReceiver(onDismissPopupReceiver,
+                new IntentFilter(ACTION_DISMISS_POPUP));
     }
 
     public FolioReader openBook(String assetOrSdcardPath) {
@@ -293,7 +329,17 @@ public class FolioReader {
 
     public FolioReader setTranslateAndCheckListener(TranslateAndCheckWordListener translateAndCheckWordListener) {
         this.translateAndCheckWordListener = translateAndCheckWordListener;
-        return  singleton;
+        return singleton;
+    }
+
+    public FolioReader setTextToSpeechListener(TextToSpeechListener textToSpeechListener) {
+        this.textToSpeechListener = textToSpeechListener;
+        return singleton;
+    }
+
+    public FolioReader setOnDismissPopupListener(OnDismissPopupListener onDismissPopupListener) {
+        this.onDismissPopupListener = onDismissPopupListener;
+        return singleton;
     }
 
     public void saveReceivedHighLights(List<HighLight> highlights,
@@ -335,6 +381,8 @@ public class FolioReader {
             singleton.onClosedListener = null;
             singleton.onAddWordListener = null;
             singleton.translateAndCheckWordListener = null;
+            singleton.textToSpeechListener = null;
+            singleton.onDismissPopupListener = null;
         }
     }
 
@@ -359,5 +407,7 @@ public class FolioReader {
         localBroadcastManager.unregisterReceiver(closedReceiver);
         localBroadcastManager.unregisterReceiver(addWordReceiver);
         localBroadcastManager.unregisterReceiver(translateAndCheckReceiver);
+        localBroadcastManager.unregisterReceiver(textToSpeechReceiver);
+        localBroadcastManager.unregisterReceiver(onDismissPopupReceiver);
     }
 }
