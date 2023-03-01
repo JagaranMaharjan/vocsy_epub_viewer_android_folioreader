@@ -33,5 +33,7 @@
     <attr name="underlineIconFillColorTop" format="reference|color" />
     <attr name="scrollBarColor" format="reference|color" />
 
+    <attr name="textColor" format="color"/>
+    <attr name="subTextColor" format="color"/>
 
 </resources>
