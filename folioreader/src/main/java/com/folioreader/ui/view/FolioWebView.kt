@@ -154,9 +154,9 @@ class FolioWebView : WebView {
 
     @JavascriptInterface
     fun toggleSystemUI() {
-//        uiHandler.post {
-//            folioActivityCallback.toggleSystemUI()
-//        }
+        uiHandler.post {
+            folioActivityCallback.toggleSystemUI()
+        }
     }
 
     @JavascriptInterface
@@ -261,22 +261,6 @@ class FolioWebView : WebView {
             lastScrollType = LastScrollType.USER
             return false
         }
-
-//        override fun onDoubleTap(e: MotionEvent): Boolean {
-//            Log.v(LOG_TAG, "-> onDoubleTap -> event -> ${e.action}")
-//
-//            webViewPager
-//
-//            evaluateJavascript("javascript:getSelectionRect()") { value ->
-//                val rectJson = JSONObject(value)
-//                setSelectionRect(
-//                    rectJson.getInt("left"), rectJson.getInt("top"),
-//                    rectJson.getInt("right"), rectJson.getInt("bottom")
-//                )
-//            }
-//
-//            return  false;
-//        }
     }
 
     constructor(context: Context) : super(context)
@@ -362,15 +346,10 @@ class FolioWebView : WebView {
             dismissPopupWindow()
             loadUrl("javascript:onTextSelectionItemClicked(${it.id})")
         }
-//        viewTextSelection.addWordButton.setOnClickListener {
-//            dismissPopupWindow()
-//            loadUrl("javascript:onTextSelectionItemClicked(${it.id})")
-//        }
     }
 
     @JavascriptInterface
     fun onTextSelectionItemClicked(id: Int, selectedText: String?) {
-
         uiHandler.post { loadUrl("javascript:clearSelection()") }
 
         when (id) {
@@ -388,10 +367,6 @@ class FolioWebView : WebView {
                 Log.v(LOG_TAG, "-> onTextSelectionItemClicked -> defineSelection -> $selectedText")
                 uiHandler.post { showDictDialog(selectedText) }
             }
-//            R.id.addSelection -> {
-//                Log.v(LOG_TAG, "-> onTextSelectionItemClicked -> addSelection -> $selectedText")
-//                uiHandler.post { showAddDialog(selectedText) }
-//            }
             else -> {
                 Log.w(LOG_TAG, "-> onTextSelectionItemClicked -> unknown id = $id")
             }
@@ -408,33 +383,6 @@ class FolioWebView : WebView {
             DictionaryFragment::class.java.name
         )
     }
-
-//    private  fun showAddDialog (selectedText: String?) {
-//        val addWordFragment = AddToMyWordsFragment()
-//        val bundle = Bundle()
-//        bundle.putString(Constants.SELECTED_WORD, selectedText?.trim())
-//
-//        val location = IntArray(2)
-//
-//
-//        Log.d(LOG_TAG, "-> xPos -> $xPos")
-//        Log.d(LOG_TAG, "-> yPos -> $yPos")
-//
-//        if (xPos == 0) {
-//            xPos= 100
-//        }
-//
-//        if (yPos == 0) {
-//            yPos = 100
-//        }
-//
-//        bundle.putInt("x_pos", xPos)
-//        bundle.putInt("y_pos", yPos)
-//
-//        addWordFragment.arguments = bundle
-//        addWordFragment.show(parentFragment.fragmentManager!!, AddToMyWordsFragment::class.java.name)
-//    }
-
 
     private fun onHighlightColorItemsClicked(style: HighlightStyle, isAlreadyCreated: Boolean) {
         parentFragment.highlight(style, isAlreadyCreated)
@@ -908,18 +856,6 @@ class FolioWebView : WebView {
                     popupWindow.dismiss()
 
                     evaluateJavascript("javascript:getSelectionText()") { selectedText ->
-//                        Log.v(LOG_TAG, "-> wordExist -> $selectedText")
-//                        val trimedText: String = selectedText.replace("\u00A0", "");
-//                        Log.v(LOG_TAG, "-> wordExist -> $trimedText")
-//                        val words = trimedText.split("\\s+".toRegex()).map { word ->
-//                            word.replace("""^[,\.]|[,\.]$""".toRegex(), "")
-//                        }
-//                        Log.v(LOG_TAG, "-> wordExist -> $words")
-//                        Log.v(LOG_TAG, "-> wordExist -> ${words.size}")
-//                        val showAddWord =  words.size == 1
-//                        Log.v(LOG_TAG, "-> wordExist -> $showAddWord")
-
-//                        viewTextSelection.addSelection.visibility = if (showAddWord) VISIBLE else GONE
                         addToMyWordsFragment = AddToMyWordsFragment(selectedText, viewTextSelection.addToMyWordsInclude)
                     }
                     popupWindow = PopupWindow(viewTextSelection, WRAP_CONTENT, WRAP_CONTENT)
