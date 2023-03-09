@@ -5,20 +5,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.Bundle
-import android.speech.tts.TextToSpeech
 import android.util.Log
-import android.view.Gravity
 import android.view.View
-import android.view.Window
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.fragment.app.DialogFragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.folioreader.Constants
 import com.folioreader.FolioReader
-import com.folioreader.R
 import kotlinx.android.synthetic.main.folio_page_fragment.view.*
 import kotlinx.android.synthetic.main.layout_add_to_my_words.*
 import kotlinx.android.synthetic.main.layout_add_to_my_words.view.*
@@ -83,7 +76,6 @@ class AddToMyWordsFragment(word: String, addToWardView: View) {
 //        }
 
         wordTextView.text = selectedWord;
-        translatedWordTextView.text = "Translated"
 
         Log.d(TAG, "-> registerReceiver")
         LocalBroadcastManager.getInstance(addToWordsView.context).registerReceiver(
@@ -186,6 +178,19 @@ class AddToMyWordsFragment(word: String, addToWardView: View) {
 
     private fun translateAndCheckWord (word: String) {
         Log.d(TAG, "-> translateAndCheckWord")
+
+        val trimmedText: String = word.replace("\u00A0", "");
+        Log.v(TAG, "-> wordExist -> $trimmedText")
+        val words = trimmedText.split("\\s+".toRegex()).map { word ->
+            word.replace("""^[,\.]|[,\.]$""".toRegex(), "")
+        }
+        if (words.size > 20) {
+            translatedWordTextView.visibility = View.GONE
+            return
+        }
+        translatedWordTextView.visibility = View.VISIBLE
+        translatedWordTextView.text = "Loading..."
+        addWordButton.text = "Loading..."
         val localBroadcastManager = LocalBroadcastManager.getInstance(addToWordsView.context)
         val intent = Intent(FolioReader.ACTION_TRANSLATE_AND_CHECK)
         intent.putExtra(FolioReader.EXTRA_TRANSLATE_AND_CHECK, word)

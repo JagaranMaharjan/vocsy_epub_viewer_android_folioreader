@@ -85,17 +85,21 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/firstSectionLayout" />
 
-            <HorizontalScrollView
-                android:id="@+id/highlightScrollView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/firstHorizontalDivider">
+<!--            <HorizontalScrollView-->
+<!--                android:id="@+id/highlightScrollView"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/firstHorizontalDivider">-->
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:paddingVertical="7dp"
+                    android:paddingHorizontal="7dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/firstHorizontalDivider">
 
 
                     <ImageView
@@ -137,7 +141,7 @@
 
                 </LinearLayout>
 
-            </HorizontalScrollView>
+<!--            </HorizontalScrollView>-->
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
