@@ -96,6 +96,7 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
     private var distractionFreeMode: Boolean = false
     private var handler: Handler? = null
 
+    private var initialChapterIndex: Int = 0
     private var currentChapterIndex: Int = 0
     private var mFolioPageFragmentAdapter: FolioPageFragmentAdapter? = null
     private var entryReadLocator: ReadLocator? = null
@@ -283,6 +284,7 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
         }
 
         mBookId = intent.getStringExtra(FolioReader.EXTRA_BOOK_ID)
+        initialChapterIndex = intent.getIntExtra(FolioReader.EXTRA_BOOK_INITIAL_PAGE, 0)
         mEpubSourceType = intent.extras!!.getSerializable(INTENT_EPUB_SOURCE_TYPE) as EpubSourceType
         if (mEpubSourceType == EpubSourceType.RAW) {
             mEpubRawId = intent.extras!!.getInt(INTENT_EPUB_SOURCE_PATH)
@@ -980,7 +982,10 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
         if (r2StreamerServer != null) r2StreamerServer!!.stop()
 
         if (isFinishing) {
-            localBroadcastManager.sendBroadcast(Intent(FolioReader.ACTION_FOLIOREADER_CLOSED))
+            val intent = Intent(FolioReader.ACTION_FOLIOREADER_CLOSED)
+            intent.putExtra(FolioReader.EXTRA_FOLIOREADER_CLOSED_CURRENT_PAGE, currentChapterIndex)
+            intent.putExtra(FolioReader.EXTRA_FOLIOREADER_CLOSED_TOTAL_PAGE, spine?.size ?: 0)
+            localBroadcastManager.sendBroadcast(intent)
             FolioReader.get().retrofit = null
             FolioReader.get().r2StreamerApi = null
         }
@@ -1070,7 +1075,7 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
                 lastReadLocator = readLocator
             }
             currentChapterIndex = getChapterIndex(readLocator)
-            mFolioPageViewPager!!.currentItem = currentChapterIndex
+            mFolioPageViewPager!!.currentItem = if (initialChapterIndex != 0) initialChapterIndex else currentChapterIndex
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(

@@ -79,7 +79,7 @@ public class HomeActivity extends AppCompatActivity
                 config.setAllowedDirection(Config.AllowedDirection.VERTICAL_AND_HORIZONTAL);
 
                 folioReader.setConfig(config, true)
-                        .openBook(R.raw.four);
+                        .openBook(R.raw.four, 12);
             }
         });
 
@@ -99,7 +99,7 @@ public class HomeActivity extends AppCompatActivity
 
                 folioReader.setReadLocator(readLocator);
                 folioReader.setConfig(config, true)
-                        .openBook("file:///android_asset/john.epub");
+                        .openBook("file:///android_asset/john.epub", 2);
             }
         });
 
@@ -108,6 +108,8 @@ public class HomeActivity extends AppCompatActivity
             config = new Config();
         config.setAllowedDirection(Config.AllowedDirection.VERTICAL_AND_HORIZONTAL);
 
+        ReadLocator readLocator = getLastReadLocator();
+        folioReader.setReadLocator(readLocator);
         folioReader.setConfig(config, true)
                 .openBook(R.raw.accessible_epub_3);
     }
@@ -199,8 +201,8 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFolioReaderClosed() {
-        Log.v(LOG_TAG, "-> onFolioReaderClosed");
+    public void onFolioReaderClosed(int currentPage, int totalPage) {
+        Log.v(LOG_TAG, "-> onFolioReaderClosed"+ currentPage + totalPage);
     }
 
     @Override

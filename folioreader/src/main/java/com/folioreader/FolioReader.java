@@ -41,11 +41,14 @@ public class FolioReader {
     private static FolioReader singleton = null;
 
     public static final String EXTRA_BOOK_ID = "com.folioreader.extra.BOOK_ID";
+    public static final String EXTRA_BOOK_INITIAL_PAGE = "com.folioreader.extra.BOOK_INITIAL_PAGE";
     public static final String EXTRA_READ_LOCATOR = "com.folioreader.extra.READ_LOCATOR";
     public static final String EXTRA_PORT_NUMBER = "com.folioreader.extra.PORT_NUMBER";
     public static final String ACTION_SAVE_READ_LOCATOR = "com.folioreader.action.SAVE_READ_LOCATOR";
     public static final String ACTION_CLOSE_FOLIOREADER = "com.folioreader.action.CLOSE_FOLIOREADER";
     public static final String ACTION_FOLIOREADER_CLOSED = "com.folioreader.action.FOLIOREADER_CLOSED";
+    public static final String EXTRA_FOLIOREADER_CLOSED_CURRENT_PAGE = "com.folioreader.extra.FOLIOREADER_CLOSED_CURRENT_PAGE";
+    public static final String EXTRA_FOLIOREADER_CLOSED_TOTAL_PAGE = "com.folioreader.extra.FOLIOREADER_CLOSED_TOTAL_PAGE";
     public static final String EXTRA_ADD_WORD = "com.folioreader.extra.ADD_WORD";
     public static final String ACTION_ADD_WORD = "com.folioreader.action.ADD_WORD";
     public static final String EXTRA_TRANSLATE_AND_CHECK = "com.folioreader.extra.TRANSLATE_AND_CHECK";
@@ -79,7 +82,7 @@ public class FolioReader {
          * Or you may call {@link FolioReader#stop()} in this method, if you wouldn't require to open
          * an epub again from your application.
          */
-        void onFolioReaderClosed();
+        void onFolioReaderClosed(int currentPage, int totalPage);
     };
 
     public interface OnAddWordListener {
@@ -124,8 +127,11 @@ public class FolioReader {
     private BroadcastReceiver closedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (onClosedListener != null)
-                onClosedListener.onFolioReaderClosed();
+            if (onClosedListener != null) {
+                int currentPage = intent.getExtras().getInt(EXTRA_FOLIOREADER_CLOSED_CURRENT_PAGE);
+                int totalPage = intent.getExtras().getInt(EXTRA_FOLIOREADER_CLOSED_TOTAL_PAGE);
+                onClosedListener.onFolioReaderClosed(currentPage, totalPage);
+            }
         }
     };
 
@@ -231,6 +237,20 @@ public class FolioReader {
     public FolioReader openBook(int rawId, String bookId) {
         Intent intent = getIntentFromUrl(null, rawId);
         intent.putExtra(EXTRA_BOOK_ID, bookId);
+        context.startActivity(intent);
+        return singleton;
+    }
+
+    public FolioReader openBook(String assetOrSdcardPath, int initialPage) {
+        Intent intent = getIntentFromUrl(assetOrSdcardPath, 0);
+        intent.putExtra(EXTRA_BOOK_INITIAL_PAGE, initialPage);
+        context.startActivity(intent);
+        return singleton;
+    }
+
+    public FolioReader openBook(int rawId, int initialPage) {
+        Intent intent = getIntentFromUrl(null, rawId);
+        intent.putExtra(EXTRA_BOOK_INITIAL_PAGE, initialPage);
         context.startActivity(intent);
         return singleton;
     }
@@ -357,7 +377,7 @@ public class FolioReader {
     /**
      * Closes all the activities related to FolioReader.
      * After closing all the activities of FolioReader, callback can be received in
-     * {@link OnClosedListener#onFolioReaderClosed()} if implemented.
+     * {@link OnClosedListener#onFolioReaderClosed(int currentPage, int totalPage)} if implemented.
      * Developer is still bound to call {@link #clear()} or {@link #stop()}
      * for clean up if required.
      */
