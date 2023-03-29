@@ -96,7 +96,6 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
     private var distractionFreeMode: Boolean = false
     private var handler: Handler? = null
 
-    private var initialChapterIndex: Int = 0
     private var currentChapterIndex: Int = 0
     private var mFolioPageFragmentAdapter: FolioPageFragmentAdapter? = null
     private var entryReadLocator: ReadLocator? = null
@@ -284,7 +283,6 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
         }
 
         mBookId = intent.getStringExtra(FolioReader.EXTRA_BOOK_ID)
-        initialChapterIndex = intent.getIntExtra(FolioReader.EXTRA_BOOK_INITIAL_PAGE, 0)
         mEpubSourceType = intent.extras!!.getSerializable(INTENT_EPUB_SOURCE_TYPE) as EpubSourceType
         if (mEpubSourceType == EpubSourceType.RAW) {
             mEpubRawId = intent.extras!!.getInt(INTENT_EPUB_SOURCE_PATH)
@@ -1075,7 +1073,7 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
                 lastReadLocator = readLocator
             }
             currentChapterIndex = getChapterIndex(readLocator)
-            mFolioPageViewPager!!.currentItem = if (initialChapterIndex != 0) initialChapterIndex else currentChapterIndex
+            mFolioPageViewPager!!.currentItem = currentChapterIndex
         }
 
         LocalBroadcastManager.getInstance(this).registerReceiver(

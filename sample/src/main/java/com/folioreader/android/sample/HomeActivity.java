@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,7 +80,7 @@ public class HomeActivity extends AppCompatActivity
                 config.setAllowedDirection(Config.AllowedDirection.VERTICAL_AND_HORIZONTAL);
 
                 folioReader.setConfig(config, true)
-                        .openBook(R.raw.four, 12);
+                        .openBook(R.raw.four);
             }
         });
 
@@ -99,7 +100,7 @@ public class HomeActivity extends AppCompatActivity
 
                 folioReader.setReadLocator(readLocator);
                 folioReader.setConfig(config, true)
-                        .openBook("file:///android_asset/john.epub", 2);
+                        .openBook("file:///android_asset/john.epub");
             }
         });
 
@@ -116,7 +117,8 @@ public class HomeActivity extends AppCompatActivity
 
     private ReadLocator getLastReadLocator() {
 
-        String jsonString = loadAssetTextAsString("Locators/LastReadLocators/last_read_locator_1.json");
+        String jsonString = "{\"bookId\":\"urn:isbn:9781449328030\",\"href\":\"/EPUB/ch02.xhtml\",\"created\":1680065091630,\"locations\":{\"cfi\":\"epubcfi(/0!/4/2[building_a_better_epub]/10/28/10/5:0)\"},\"title\":\"\"}";
+//                loadAssetTextAsString("Locators/LastReadLocators/last_read_locator_1.json");
         return ReadLocator.fromJson(jsonString);
     }
 
@@ -202,7 +204,14 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onFolioReaderClosed(int currentPage, int totalPage) {
-        Log.v(LOG_TAG, "-> onFolioReaderClosed"+ currentPage + totalPage);
+        Log.v(LOG_TAG, "-> onFolioReaderClosed" + currentPage + totalPage);
+        final Map<String, Object> mapd = new HashMap<String, Object>();
+        ReadLocator readLocator = getLastReadLocator();
+
+        mapd.put("currentPage", currentPage);
+        mapd.put("totalPage", totalPage);
+        mapd.put("readLocator", readLocator.toJson());
+        Log.v(LOG_TAG, "-> onFolioReaderClosed" + mapd);
     }
 
     @Override

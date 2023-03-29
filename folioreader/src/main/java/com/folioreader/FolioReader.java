@@ -41,7 +41,6 @@ public class FolioReader {
     private static FolioReader singleton = null;
 
     public static final String EXTRA_BOOK_ID = "com.folioreader.extra.BOOK_ID";
-    public static final String EXTRA_BOOK_INITIAL_PAGE = "com.folioreader.extra.BOOK_INITIAL_PAGE";
     public static final String EXTRA_READ_LOCATOR = "com.folioreader.extra.READ_LOCATOR";
     public static final String EXTRA_PORT_NUMBER = "com.folioreader.extra.PORT_NUMBER";
     public static final String ACTION_SAVE_READ_LOCATOR = "com.folioreader.action.SAVE_READ_LOCATOR";
@@ -237,20 +236,6 @@ public class FolioReader {
     public FolioReader openBook(int rawId, String bookId) {
         Intent intent = getIntentFromUrl(null, rawId);
         intent.putExtra(EXTRA_BOOK_ID, bookId);
-        context.startActivity(intent);
-        return singleton;
-    }
-
-    public FolioReader openBook(String assetOrSdcardPath, int initialPage) {
-        Intent intent = getIntentFromUrl(assetOrSdcardPath, 0);
-        intent.putExtra(EXTRA_BOOK_INITIAL_PAGE, initialPage);
-        context.startActivity(intent);
-        return singleton;
-    }
-
-    public FolioReader openBook(int rawId, int initialPage) {
-        Intent intent = getIntentFromUrl(null, rawId);
-        intent.putExtra(EXTRA_BOOK_INITIAL_PAGE, initialPage);
         context.startActivity(intent);
         return singleton;
     }
