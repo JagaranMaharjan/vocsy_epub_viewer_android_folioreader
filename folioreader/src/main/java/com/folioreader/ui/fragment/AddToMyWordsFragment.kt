@@ -12,6 +12,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.folioreader.FolioReader
+import com.folioreader.R
 import kotlinx.android.synthetic.main.folio_page_fragment.view.*
 import kotlinx.android.synthetic.main.layout_add_to_my_words.*
 import kotlinx.android.synthetic.main.layout_add_to_my_words.view.*
@@ -58,6 +59,7 @@ class AddToMyWordsFragment(word: String, addToWardView: View) {
 
                 translatedWordTextView.text = translatedWord
                 addWordButton.text =  if (wordExists) "Word added" else "Add to Pocket"
+                addWordButton.setBackgroundResource(if (wordExists) R.drawable.inter_grey_button else R.drawable.inter_primary_button)
             }
         }
     }
