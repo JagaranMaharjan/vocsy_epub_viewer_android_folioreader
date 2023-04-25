@@ -76,8 +76,10 @@ class AddToMyWordsFragment(word: String, addToWardView: View) {
 //        speechButton.setOnClickListener {
 //            tts?.speak(selectedWord, TextToSpeech.QUEUE_FLUSH, null,"")
 //        }
-
-        wordTextView.text = selectedWord;
+        var text = selectedWord.replace("\\n","\n");
+        text = text.replace("\\r","\n");
+        text = text.replace("\\t","\n");
+        wordTextView.text = text;
 
         Log.d(TAG, "-> registerReceiver")
         LocalBroadcastManager.getInstance(addToWordsView.context).registerReceiver(
