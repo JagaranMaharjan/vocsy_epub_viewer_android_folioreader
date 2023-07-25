@@ -53,6 +53,7 @@ public class FolioReader {
     public static final String EXTRA_TRANSLATE_AND_CHECK = "com.folioreader.extra.TRANSLATE_AND_CHECK";
     public static final String ACTION_TRANSLATE_AND_CHECK = "com.folioreader.action.TRANSLATE_AND_CHECK";
     public static final String ACTION_TEXT_TO_SPEECH = "com.folioreader.action.TEXT_TO_SPEECH";
+    //
     public static final String EXTRA_TEXT_TO_SPEECH = "com.folioreader.extra.TEXT_TO_SPEECH";
     public static final String ACTION_DISMISS_POPUP = "com.folioreader.action.DISMISS_POPUP";
 
