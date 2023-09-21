@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Parcelable;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -275,6 +276,7 @@ public class FolioReader {
      *                       saved one while execution.
      */
     public FolioReader setConfig(Config config, boolean overrideConfig) {
+        Log.v("FolioReader", "-> setConfig -> lastCommit: portrait orientation");
         this.config = config;
         this.overrideConfig = overrideConfig;
         return singleton;
