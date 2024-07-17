@@ -326,11 +326,16 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
         setSupportActionBar(toolbar)
         actionBar = supportActionBar
 
+        actionBar!!.setHomeButtonEnabled(true)
+        actionBar!!.setDisplayHomeAsUpEnabled(true)
+
+
         val config = AppUtil.getSavedConfig(applicationContext)!!
 
-        val drawable = ContextCompat.getDrawable(this, R.drawable.ic_drawer)
-        UiUtil.setColorIntToDrawable(config.currentThemeColor, drawable!!)
-        toolbar!!.navigationIcon = drawable
+//        val drawable = ContextCompat.getDrawable(this, R.drawable.ic_drawer)
+//        UiUtil.setColorIntToDrawable(config.currentThemeColor, drawable!!)
+//        toolbar!!.navigationIcon = drawable
+
 
         if (config.isNightMode) {
             setNightMode()
@@ -377,6 +382,7 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
             UiUtil.setColorIntToDrawable(config.themeColor, m.findItem(R.id.itemSearch).icon)
             UiUtil.setColorIntToDrawable(config.themeColor, m.findItem(R.id.itemConfig).icon)
             UiUtil.setColorIntToDrawable(config.themeColor, m.findItem(R.id.itemTts).icon)
+            UiUtil.setColorIntToDrawable(config.themeColor, m.findItem(R.id.itemDrawer).icon)
         }
 
         toolbar?.getOverflowIcon()?.setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_ATOP);
@@ -402,6 +408,7 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
         // Update toolbar colors
         createdMenu?.let { m ->
             UiUtil.setColorIntToDrawable(config.nightThemeColor, m.findItem(R.id.itemBookmark).icon)
+            UiUtil.setColorIntToDrawable(config.themeColor, m.findItem(R.id.itemDrawer).icon)
             UiUtil.setColorIntToDrawable(config.nightThemeColor, m.findItem(R.id.itemSearch).icon)
             UiUtil.setColorIntToDrawable(config.nightThemeColor, m.findItem(R.id.itemConfig).icon)
             UiUtil.setColorIntToDrawable(config.nightThemeColor, m.findItem(R.id.itemTts).icon)
@@ -441,6 +448,9 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
                 config.currentThemeColor, menu.findItem(R.id.itemBookmark).icon
             )
             UiUtil.setColorIntToDrawable(
+                config.currentThemeColor, menu.findItem(R.id.itemDrawer).icon
+            )
+            UiUtil.setColorIntToDrawable(
                 config.currentThemeColor, menu.findItem(R.id.itemSearch).icon
             )
             UiUtil.setColorIntToDrawable(
@@ -457,14 +467,15 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        //Log.d(LOG_TAG, "-> onOptionsItemSelected -> " + item.getItemId());
+        Log.d(LOG_TAG, "-> onOptionsItemSelected -> " + item.getItemId());
 
         when (item.itemId) {
             android.R.id.home -> {
                 Log.v(LOG_TAG, "-> onOptionsItemSelected -> drawer")
-                startContentHighlightActivity()
+                finish()
                 return true
             }
+
             R.id.itemBookmark -> {
                 val readLocator = currentFragment!!.getLastReadLocator()
                 Log.v(LOG_TAG, "-> onOptionsItemSelected 'if' -> bookmark")
@@ -511,6 +522,12 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
 
                 return true
             }
+
+            R.id.itemDrawer -> {
+                startContentHighlightActivity()
+                return true
+            }
+
             R.id.itemSearch -> {
                 Log.v(LOG_TAG, "-> onOptionsItemSelected -> " + item.title)
                 if (searchUri == null) return true
@@ -523,17 +540,20 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
                 return true
 
             }
+
             R.id.itemConfig -> {
                 Log.v(LOG_TAG, "-> onOptionsItemSelected -> " + item.title)
                 showConfigBottomSheetDialogFragment()
                 return true
 
             }
+
             R.id.itemTts -> {
                 Log.v(LOG_TAG, "-> onOptionsItemSelected -> " + item.title)
                 showMediaController()
                 return true
             }
+
             else -> return super.onOptionsItemSelected(item)
         }
 
@@ -609,10 +629,12 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
                 val epubParser = EpubParser()
                 epubParser.parse(path!!, "")
             }
+
             Publication.EXTENSION.CBZ -> {
                 val cbzParser = CbzParser()
                 cbzParser.parse(path!!, "")
             }
+
             else -> {
                 null
             }
@@ -942,6 +964,7 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
                     goToChapter(data.getStringExtra(SELECTED_CHAPTER_POSITION)!!)
 
                 }
+
                 HIGHLIGHT_SELECTED -> {
                     val highlightImpl = data.getParcelableExtra<HighlightImpl>(HIGHLIGHT_ITEM)
                     currentChapterIndex = highlightImpl!!.pageNumber
@@ -949,6 +972,7 @@ class FolioActivity : AppCompatActivity(), FolioActivityCallback, MediaControlle
                     val folioPageFragment = currentFragment ?: return
                     folioPageFragment.scrollToHighlightId(highlightImpl.rangy)
                 }
+
                 BOOKMARK_SELECTED -> {
                     val bookmark =
                         data.getSerializableExtra(BOOKMARK_ITEM) as HashMap<String, String>

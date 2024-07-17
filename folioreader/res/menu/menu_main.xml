@@ -12,6 +12,14 @@
         tools:showAsAction="always" />
 
     <item
+        android:id="@+id/itemDrawer"
+        android:icon="@drawable/ic_drawer"
+        android:title="Drawer"
+        android:visible="true"
+        app:showAsAction="ifRoom"
+        tools:showAsAction="always" />
+
+    <item
         android:id="@+id/itemSearch"
         android:icon="@drawable/ic_search"
         android:title="@string/menu_item_search"
@@ -33,5 +41,7 @@
         android:visible="false"
         app:showAsAction="ifRoom"
         tools:showAsAction="always" />
+
+
 
 </menu>

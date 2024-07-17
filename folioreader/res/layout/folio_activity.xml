@@ -32,7 +32,9 @@
             android:layout_height="?android:attr/actionBarSize"
             app:contentInsetLeft="0dp"
             app:contentInsetStart="0dp"
-            app:contentInsetStartWithNavigation="0dp" />
+            app:contentInsetStartWithNavigation="0dp"
+
+            />
 
     </com.folioreader.ui.view.FolioAppBarLayout>
 
