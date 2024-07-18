@@ -44,25 +44,25 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/addToMyWordsInclude">
 
-                <ImageButton
-                    android:id="@+id/copySelection"
-                    android:layout_width="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/inter_grey_button"
-                    android:padding="10dp"
-                    android:src="@drawable/ic_copy" />
+<!--                <ImageButton-->
+<!--                    android:id="@+id/copySelection"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:background="@drawable/inter_grey_button"-->
+<!--                    android:padding="10dp"-->
+<!--                    android:src="@drawable/ic_copy" />-->
 
-                <ImageButton
-                    android:id="@+id/shareSelection"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:background="@drawable/inter_grey_button"
-                    android:padding="10dp"
-                    android:src="@drawable/ic_share" />
+<!--                <ImageButton-->
+<!--                    android:id="@+id/shareSelection"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:layout_marginLeft="8dp"-->
+<!--                    android:layout_marginRight="8dp"-->
+<!--                    android:background="@drawable/inter_grey_button"-->
+<!--                    android:padding="10dp"-->
+<!--                    android:src="@drawable/ic_share" />-->
 
                 <ImageButton
                     android:id="@+id/defineSelection"
